@@ -41,6 +41,18 @@
         },
       };
     </script>
+    <style>
+      .fade-out {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+      }
+      .fade-in {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+      }
+    </style>
     <!-- Custom Style -->
     <link rel="stylesheet" href="css/style.css" />
     <!-- Lucide Icons -->
@@ -349,17 +361,37 @@
         function renderAyah(ayah, label) {
           if (!ayah) return;
           currentAyah = ayah;
-          
-          if (label && els.info) els.info.innerText = label;
-          if (els.arabic) els.arabic.innerText = ayah.arabic;
-          if (els.trans) els.trans.innerText = '"' + ayah.translation + '"';
-          if (els.surah) els.surah.innerText = ayah.surah + " : " + ayah.ayah;
-          
-          if (els.fsArabic) els.fsArabic.innerText = ayah.arabic;
-          if (els.fsTrans) els.fsTrans.innerText = '"' + ayah.translation + '"';
-          if (els.fsSurah) els.fsSurah.innerText = ayah.surah + " : " + ayah.ayah;
 
-          updateBookmarkBtnState();
+          // Select the text container elements that need to animate
+          const elementsToAnimate = [els.arabic, els.trans, els.surah, els.info].filter(Boolean);
+
+          // 1. Fade out current content
+          elementsToAnimate.forEach(el => {
+            el.classList.remove("fade-in");
+            el.classList.add("fade-out");
+          });
+
+          // 2. Wait for fade out, then change text and fade in
+          setTimeout(() => {
+            if (label && els.info) els.info.innerText = label;
+            if (els.arabic) els.arabic.innerText = ayah.arabic;
+            if (els.trans) els.trans.innerText = '"' + ayah.translation + '"';
+            if (els.surah) els.surah.innerText = ayah.surah + " : " + ayah.ayah;
+            
+            if (els.fsArabic) els.fsArabic.innerText = ayah.arabic;
+            if (els.fsTrans) els.fsTrans.innerText = '"' + ayah.translation + '"';
+            if (els.fsSurah) els.fsSurah.innerText = ayah.surah + " : " + ayah.ayah;
+
+            updateBookmarkBtnState();
+
+            // Render new content visible smoothly
+            elementsToAnimate.forEach(el => {
+              el.classList.remove("fade-out");
+              // Force reflow
+              void el.offsetWidth;
+              el.classList.add("fade-in");
+            });
+          }, 500); // 500ms matches the CSS transition time
         }
 
         function updateBookmarkBtnState() {
