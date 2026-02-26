@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ayat of The Day - Ketenangan di Setiap Ayat</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -44,12 +45,15 @@
     <link rel="stylesheet" href="css/style.css" />
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- HTML2Canvas for Image Sharing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   </head>
   <body
     class="bg-beige-50 ui-font text-slate-800 transition-colors duration-500 overflow-x-hidden min-h-screen"
   >
     <div
-      class="islamic-pattern fixed inset-0 opacity-5 pointer-events-none"
+      class="islamic-pattern fixed inset-0 opacity-5 pointer-events-none z-[-1]"
+      style="pointer-events: none; z-index: -1;"
     ></div>
 
     <div
@@ -83,8 +87,10 @@
       <main class="flex-grow flex flex-col justify-center mb-12">
         <div
           id="ayahCard"
-          class="ayah-card bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-emerald-50 dark:border-slate-700 relative overflow-hidden animate-fade-in"
+          class="ayah-card bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-emerald-50 dark:border-slate-700 relative overflow-hidden animate-fade-in flex flex-col h-full"
         >
+          <!-- Decorative Top -->
+          <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
           <!-- Skeleton Loading -->
           <div id="loading" class="hidden">
             <div
@@ -132,6 +138,7 @@
             <div class="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 md:gap-4 mt-8">
               <button
                 id="copyBtn"
+                onclick="alert('Klick terdeteksi pada tombol secara native!')"
                 class="flex items-center justify-center gap-2 px-4 md:px-6 py-3 bg-white dark:bg-slate-700 border border-emerald-100 dark:border-slate-600 rounded-2xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-600 transition-all shadow-sm active:scale-95"
               >
                 <i data-lucide="copy" class="w-4 h-4 text-emerald-600"></i>
@@ -171,7 +178,7 @@
         </div>
 
         <!-- Bookmark Section -->
-        <div id="bookmarkSection" class="mt-12 animate-fade-in hidden" style="animation-delay: 0.1s">
+        <div id="bookmarkSection" class="mt-12 animate-fade-in hidden" style="display:none; animation-delay: 0.1s">
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-2">
               <i data-lucide="bookmark" class="w-5 h-5 text-emerald-600"></i>
@@ -206,9 +213,17 @@
             placeholder="Tuliskan pelajaran atau doa hari ini..."
             class="w-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-emerald-100 dark:border-slate-700 rounded-2xl p-6 text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-slate-300 min-h-[120px]"
           ></textarea>
-          <p id="saveStatus" class="text-[10px] text-slate-400 mt-2 text-right">
-            Tersimpan secara otomatis ke browser Anda.
-          </p>
+          <div class="flex justify-between items-center mt-3">
+            <p id="saveStatus" class="text-[10px] text-slate-400">
+              Tersimpan lokal di browser Anda.
+            </p>
+            <button
+              id="saveReflectionBtn"
+              class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+            >
+              <i data-lucide="save" class="w-4 h-4"></i> Simpan
+            </button>
+          </div>
         </div>
       </main>
 
@@ -223,17 +238,14 @@
         </p>
         <div class="flex justify-center gap-6 mb-4">
           <a
-            href="#"
+            href="https://instagram.com/fvariz"
+            target="_blank"
             class="text-slate-400 hover:text-emerald-600 transition-colors"
             ><i data-lucide="instagram" class="w-5 h-5"></i
           ></a>
           <a
-            href="#"
-            class="text-slate-400 hover:text-emerald-600 transition-colors"
-            ><i data-lucide="twitter" class="w-5 h-5"></i
-          ></a>
-          <a
-            href="#"
+            href="https://github.com/farizrauf"
+            target="_blank"
             class="text-slate-400 hover:text-emerald-600 transition-colors"
             ><i data-lucide="github" class="w-5 h-5"></i
           ></a>
@@ -247,7 +259,7 @@
     </div>
 
     <!-- Fullscreen Modal -->
-    <div id="fullscreenOverlay" class="fixed inset-0 bg-white dark:bg-slate-900 z-[100] hidden flex flex-col items-center justify-center p-8 md:p-20 transition-all duration-500 overflow-y-auto">
+    <div id="fullscreenOverlay" class="fixed inset-0 bg-white dark:bg-slate-900 z-[100] hidden flex-col items-center justify-center p-8 md:p-20 transition-all duration-500 overflow-y-auto" style="display:none;">
       <button id="closeFullscreen" class="absolute top-8 right-8 p-3 hover:bg-emerald-50 dark:hover:bg-slate-800 rounded-full transition-colors">
         <i data-lucide="x" class="w-6 h-6 text-slate-500"></i>
       </button>
@@ -264,6 +276,344 @@
     <div id="toastContainer" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[110] pointer-events-none space-y-2"></div>
 
     <!-- Scripts -->
-    <script src="js/app.js"></script>
+    <script src="data/ayat.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // --- 1. Safely Initialize Icons ---
+        function initIcons() {
+          try {
+            if (typeof lucide !== "undefined" && lucide.createIcons) {
+              lucide.createIcons();
+            }
+          } catch (e) {
+            console.warn("Lucide failed to load", e);
+          }
+        }
+        initIcons();
+
+        // --- 2. Element Selectors ---
+        const els = {
+          arabic: document.getElementById("arabicText"),
+          trans: document.getElementById("translationText"),
+          surah: document.getElementById("surahText"),
+          info: document.getElementById("ayahInfo"),
+          card: document.getElementById("ayahCard"),
+          btnRandom: document.getElementById("randomBtn"),
+          btnCopy: document.getElementById("copyBtn"),
+          btnShare: document.getElementById("shareBtn"),
+          btnBookmark: document.getElementById("bookmarkBtn"),
+          btnFs: document.getElementById("fullscreenBtn"),
+          fsOverlay: document.getElementById("fullscreenOverlay"),
+          fsClose: document.getElementById("closeFullscreen"),
+          fsArabic: document.getElementById("fsArabicText"),
+          fsTrans: document.getElementById("fsTranslationText"),
+          fsSurah: document.getElementById("fsSurahText"),
+          toastContainer: document.getElementById("toastContainer"),
+          themeToggle: document.getElementById("darkModeToggle"),
+          bmSection: document.getElementById("bookmarkSection"),
+          bmList: document.getElementById("bookmarkList"),
+          bmShow: document.getElementById("showBookmarks"),
+          bmClose: document.getElementById("closeBookmarks"),
+          bmToggleDiv: document.getElementById("viewBookmarksToggle"),
+          reflection: document.getElementById("reflectionNote"),
+          saveStatus: document.getElementById("saveStatus"),
+          btnSaveReflection: document.getElementById("saveReflectionBtn"),
+          watermark: document.getElementById("captureWatermark")
+        };
+
+        // --- 3. State ---
+        let ayahs = window.ayatData || [];
+        let currentAyah = null;
+        let bookmarks = [];
+
+        try {
+          bookmarks = JSON.parse(localStorage.getItem("ayahBookmarks") || "[]");
+        } catch (e) {}
+
+        // --- 4. Utilities ---
+        function showToast(msg, isInfo) {
+          if (!els.toastContainer) return;
+          const toast = document.createElement("div");
+          toast.className = `flex items-center gap-3 px-6 py-3 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-emerald-100 dark:border-slate-700 transition-all duration-500 transform translate-y-10 opacity-0 pointer-events-auto mt-2`;
+          toast.innerHTML = `<i data-lucide="${isInfo ? 'info' : 'check-circle'}" class="w-4 h-4 ${isInfo ? 'text-blue-500' : 'text-emerald-600'}"></i> <span class="text-sm font-medium text-slate-700 dark:text-slate-200">${msg}</span>`;
+          els.toastContainer.appendChild(toast);
+          initIcons();
+          requestAnimationFrame(() => toast.classList.remove("translate-y-10", "opacity-0"));
+          setTimeout(() => {
+            toast.classList.add("-translate-y-5", "opacity-0");
+            setTimeout(() => toast.remove(), 500);
+          }, 3000);
+        }
+
+        // --- 5. Core Functions ---
+        function renderAyah(ayah, label) {
+          if (!ayah) return;
+          currentAyah = ayah;
+          
+          if (label && els.info) els.info.innerText = label;
+          if (els.arabic) els.arabic.innerText = ayah.arabic;
+          if (els.trans) els.trans.innerText = '"' + ayah.translation + '"';
+          if (els.surah) els.surah.innerText = ayah.surah + " : " + ayah.ayah;
+          
+          if (els.fsArabic) els.fsArabic.innerText = ayah.arabic;
+          if (els.fsTrans) els.fsTrans.innerText = '"' + ayah.translation + '"';
+          if (els.fsSurah) els.fsSurah.innerText = ayah.surah + " : " + ayah.ayah;
+
+          updateBookmarkBtnState();
+        }
+
+        function updateBookmarkBtnState() {
+          if (!currentAyah || !els.btnBookmark) return;
+          const isBookmarked = bookmarks.some(b => b.id === currentAyah.id);
+          const icon = els.btnBookmark.querySelector("i") || els.btnBookmark.querySelector("svg");
+          if (icon) {
+            icon.setAttribute("data-lucide", isBookmarked ? "bookmark-check" : "bookmark");
+          }
+          if (isBookmarked) {
+            els.btnBookmark.classList.add("bg-emerald-50", "border-emerald-200");
+          } else {
+            els.btnBookmark.classList.remove("bg-emerald-50", "border-emerald-200");
+          }
+          initIcons();
+        }
+
+        function renderBookmarksList() {
+          if (!els.bmList) return;
+          if (bookmarks.length === 0) {
+            els.bmList.innerHTML = `<p class="text-sm text-slate-400 italic py-4 text-center">Belum ada ayat yang disimpan.</p>`;
+            return;
+          }
+          
+          els.bmList.innerHTML = bookmarks.map(b => `
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-emerald-50 dark:border-slate-700 shadow-sm flex justify-between items-center group hover:border-emerald-200 transition-all cursor-pointer relative" data-id="${b.id}">
+                <div class="flex-grow bm-item-click" data-id="${b.id}">
+                    <p class="text-[10px] uppercase font-bold text-emerald-600 mb-1">${b.surah} : ${b.ayah}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">${b.arabic}</p>
+                </div>
+                <button class="remove-bookmark p-2 text-slate-300 hover:text-red-500 transition-all z-10 relative" data-id="${b.id}">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+          `).join("");
+          initIcons();
+
+          // Attach list events
+          document.querySelectorAll('.bm-item-click').forEach(el => {
+            el.onclick = function() {
+              const id = parseInt(this.getAttribute('data-id'));
+              const ayah = ayahs.find(a => a.id === id);
+              if (ayah) {
+                renderAyah(ayah, "Dari Bookmark");
+                if (els.bmSection) els.bmSection.style.display = 'none';
+                if (els.bmToggleDiv) els.bmToggleDiv.style.display = '';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            };
+          });
+
+          document.querySelectorAll('.remove-bookmark').forEach(el => {
+            el.onclick = function(e) {
+              e.stopPropagation();
+              const id = parseInt(this.getAttribute('data-id'));
+              bookmarks = bookmarks.filter(b => b.id !== id);
+              try { localStorage.setItem("ayahBookmarks", JSON.stringify(bookmarks)); } catch(err) {}
+              renderBookmarksList();
+              updateBookmarkBtnState();
+              showToast("Bookmark dihapus", true);
+            };
+          });
+        }
+
+        // --- 6. Event Listeners ---
+        
+        // Random
+        if (els.btnRandom) {
+          els.btnRandom.onclick = function() {
+            if (ayahs.length === 0) return;
+            const idx = Math.floor(Math.random() * ayahs.length);
+            renderAyah(ayahs[idx], "Ayat Pilihan");
+          };
+        }
+
+        // Copy
+        if (els.btnCopy) {
+          els.btnCopy.onclick = function() {
+            if (!currentAyah) return;
+            const text = `${currentAyah.arabic}\\n\\n"${currentAyah.translation}"\\n(${currentAyah.surah} : ${currentAyah.ayah})`;
+            navigator.clipboard.writeText(text).then(() => showToast("Ayat berhasil disalin")).catch(() => showToast("Gagal menyalin", true));
+          };
+        }
+
+        // Share (Image Generation)
+        if (els.btnShare && els.card) {
+          els.btnShare.onclick = function() {
+            if (!currentAyah) return;
+            
+            // Show loading state on button
+            const originalHtml = els.btnShare.innerHTML;
+            els.btnShare.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 text-emerald-600 animate-spin"></i><span class="inline">Memproses...</span>`;
+            initIcons();
+            
+            // Generate Image
+            setTimeout(() => {
+              // Hide buttons briefly for clean screenshot
+              const actionsDiv = els.card.querySelector('.grid');
+              if (actionsDiv) actionsDiv.style.display = 'none';
+              if (els.watermark) els.watermark.style.display = 'block';
+              
+              const scale = 2; // High resolution
+              html2canvas(els.card, {
+                scale: scale,
+                backgroundColor: document.documentElement.classList.contains("dark") ? "#161e2e" : "#ffffff",
+                logging: false,
+                useCORS: true
+              }).then(canvas => {
+                // Restore UI
+                if (actionsDiv) actionsDiv.style.display = '';
+                if (els.watermark) els.watermark.style.display = 'none';
+                els.btnShare.innerHTML = originalHtml;
+                initIcons();
+
+                canvas.toBlob(function(blob) {
+                  const filename = `ayat-of-the-day-${currentAyah.surah.toLowerCase()}-${currentAyah.ayah}.png`;
+                  const file = new File([blob], filename, { type: "image/png" });
+
+                  // Try Native Web Share API first (Mobile)
+                  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                      files: [file],
+                      title: 'Ayat of The Day',
+                      text: 'Renungan hari ini dari Ayat of The Day 📖✨'
+                    })
+                    .then(() => showToast("Berhasil dibagikan!"))
+                    .catch((err) => {
+                       // User cancelled or failed, fallback to download
+                       triggerDownload(blob, filename);
+                    });
+                  } else {
+                    // Fallback to Download (Desktop)
+                    triggerDownload(blob, filename);
+                    showToast("Gambar berhasil diunduh!");
+                  }
+                }, "image/png", 1.0);
+              }).catch(err => {
+                if (actionsDiv) actionsDiv.style.display = '';
+                if (els.watermark) els.watermark.style.display = 'none';
+                els.btnShare.innerHTML = originalHtml;
+                initIcons();
+                showToast("Gagal membuat gambar", true);
+                console.error(err);
+              });
+            }, 100);
+          };
+        }
+
+        function triggerDownload(blob, filename) {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.style.display = "none";
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          a.remove();
+        }
+
+        // Bookmark Add/Remove
+        if (els.btnBookmark) {
+          els.btnBookmark.onclick = function() {
+            if (!currentAyah) return;
+            const exists = bookmarks.findIndex(b => b.id === currentAyah.id);
+            if (exists >= 0) {
+              bookmarks.splice(exists, 1);
+              showToast("Dihapus dari bookmark", true);
+            } else {
+              bookmarks.push(currentAyah);
+              showToast("Disimpan ke bookmark");
+            }
+            try { localStorage.setItem("ayahBookmarks", JSON.stringify(bookmarks)); } catch(err) {}
+            updateBookmarkBtnState();
+            renderBookmarksList();
+          };
+        }
+
+        // Fullscreen Toggle
+        if (els.btnFs && els.fsOverlay) {
+          els.btnFs.onclick = function() {
+            els.fsOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+          };
+        }
+        if (els.fsClose && els.fsOverlay) {
+          els.fsClose.onclick = function() {
+            els.fsOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+          };
+        }
+
+        // Bookmark Section Toggle
+        if (els.bmShow && els.bmSection) {
+          els.bmShow.onclick = function() {
+            els.bmSection.style.display = 'block';
+            if (els.bmToggleDiv) els.bmToggleDiv.style.display = 'none';
+            els.bmSection.scrollIntoView({ behavior: 'smooth' });
+          };
+        }
+        if (els.bmClose && els.bmSection) {
+          els.bmClose.onclick = function() {
+            els.bmSection.style.display = 'none';
+            if (els.bmToggleDiv) els.bmToggleDiv.style.display = 'flex';
+          };
+        }
+
+        // Theme Toggle
+        if (els.themeToggle) {
+          els.themeToggle.onclick = function() {
+            const isDark = document.documentElement.classList.toggle("dark");
+            try { localStorage.theme = isDark ? "dark" : "light"; } catch(e) {}
+            const icon = els.themeToggle.querySelector("i") || els.themeToggle.querySelector("svg");
+            if (icon) {
+              icon.setAttribute("data-lucide", isDark ? "sun" : "moon");
+              icon.className = isDark ? "w-5 h-5 text-yellow-400" : "w-5 h-5 text-emerald-700";
+              initIcons();
+            }
+          };
+        }
+
+        // Save Reflection Button
+        if (els.btnSaveReflection && els.reflection) {
+          els.btnSaveReflection.onclick = function() {
+            try { localStorage.setItem("dailyReflection", els.reflection.value); } catch(err) {}
+            showToast("Refleksi berhasil disimpan");
+          };
+        }
+
+        // --- 7. Initialize First App State ---
+        try {
+          if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            document.documentElement.classList.add("dark");
+            const icon = els.themeToggle.querySelector("i") || els.themeToggle.querySelector("svg");
+            if (icon) {
+              icon.setAttribute("data-lucide", "sun");
+              icon.className = "w-5 h-5 text-yellow-400";
+              initIcons();
+            }
+          }
+        } catch (e) {}
+
+        if (ayahs.length > 0) {
+          // Calculate daily index based on day of year
+          const now = new Date();
+          const start = new Date(now.getFullYear(), 0, 0);
+          const diff = now - start;
+          const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+          renderAyah(ayahs[dayOfYear % ayahs.length], "Ayat Hari Ini");
+        } else {
+          if (els.info) els.info.innerText = "Gagal Memuat Data";
+        }
+        renderBookmarksList();
+      });
+    </script>
   </body>
 </html>
